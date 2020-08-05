@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <section class="login">
+        <h2>계정생성</h2>
+        <ul>
+            <form method="POST" action="{% url 'signup' %}">
+            {% csrf_token %}
+            <li><input type="password" placeholder="비밀번호"  name="password1"></li>
+            <li><input type="password" placeholder="비밀번호 확인" name="password2"></li>
+            <li><input type="email" placeholder="email" name="email"></li>
+            <li><input type="text" placeholder="닉네임" name="nickname"></li>
+            <div style=" margin: 0 0 0 30px; color: red;" class="messages">
+                {% if messages %}
+                {% for message in messages %}
+                {{ message.message }}
+                {% endfor %}
+                {% endif %}
+            </div>
+            <li><button type="submit">계정 생성</button></li>
+
+           
+
+
+            <li><input type="text" class="username_input" placeholder="아이디" name="username" check_result="fail" required /></li> 
+            <button class="id_overlap_button" onclick="id_overlap_check()">중복검사</button>
+            <img id="id_check_success" style="display: none;">
+
+
+            function id_overlap_check() {
+
+                $('.username_input').change(function () {
+                  $('#id_check_sucess').hide();
+                  $('.id_overlap_button').show();
+                  $('.username_input').attr("check_result", "fail");
+                })
+            
+            
+                if ($('.username_input').val() == '') {
+                  alert('이메일을 입력해주세요.')
+                  return;
+                }
+            
+                id_overlap_input = document.querySelector('input[name="username"]');
+            
+                $.ajax({
+                  url: "{% url 'account:id_overlap_check' %}",
+                  data: {
+                    'username': id_overlap_input.value
+                  },
+                  datatype: 'json',
+                  success: function (data) {
+                    console.log(data['overlap']);
+                    if (data['overlap'] == "fail") {
+                      alert("이미 존재하는 아이디 입니다.");
+                      id_overlap_input.focus();
+                      return;
+                    } else {
+                      alert("사용가능한 아이디 입니다.");
+                      $('.username_input').attr("check_result", "success");
+                      $('#id_check_sucess').show();
+                      $('.id_overlap_button').hide();
+                      return;
+                    }
+                  }
+                });
+              }
+
+
+            if ($('.username').attr("check_result")=="fail"){
+                alert("아이디 중복체크를 해주시기 바랍니다.");
+                $('.username_input).focus();
+                return false;
+            }
+
+            </form>
+            
+        </ul>
+    </section>
+</body>
+</html>
